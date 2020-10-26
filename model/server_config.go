@@ -210,8 +210,6 @@ func setServerConfig() {
 		IdleSize:    viper.GetInt(DatasourceIdleSize),
 		MaxSize:     viper.GetInt(DatasourceMaxSize),
 		MaxLifeTime: viper.GetInt64(DatasourceMaxLifeTime),
-		SqlDebug:    viper.GetInt(DatasourceSqlDebug),
-		Memory:      false,
 	}
 	mysqlConfigs = append(mysqlConfigs, mysqlConfig)
 

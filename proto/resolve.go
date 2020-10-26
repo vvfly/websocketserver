@@ -1,36 +1,10 @@
 package proto
 
-import (
-	"strconv"
-	"strings"
-
-	. "github.com/luckyweiwei/base/logger"
-	"github.com/luckyweiwei/websocketserver/helper"
-	"github.com/luckyweiwei/websocketserver/model"
-)
-
-const (
-	// userSeparator    = "216546566"
-	userSeparator    = "_-_"
-	sessionSeparator = "&"
-	authenSeparator  = "_"
-	wsConSeparator   = "/"
-
-	salt = "f0a09636-60b1-4c50-998e-5bbb6a864e27"
-)
-
 type SessionsInfo struct {
 	LiveID    string // 房间ID
 	UserID    string // 用户ID
 	EnterType string // 进入类型  1为开播端， 2 为观看端
 	AppID     string // 渠道ID
-}
-
-func newSessionInfo(s string) *SessionsInfo {
-	if p := strings.Split(string(s), sessionSeparator); len(p) > 3 {
-		return &SessionsInfo{LiveID: p[0], UserID: p[1], EnterType: p[2], AppID: p[3]}
-	}
-	return nil
 }
 
 type UserInfo struct {
@@ -68,50 +42,7 @@ type UserInfo struct {
 	LastEntryLiveTime int64 // 最后进入直播间时间
 }
 
-func newUserInfo(s string) *UserInfo {
-	if txt := helper.XorStrInteger(s); len(txt) > 0 {
-		if txt, err := helper.DecodeBase64(txt); err == nil {
-			if p := strings.Split(string(txt), userSeparator); len(p) > 22 {
-				expGrade, _ := strconv.Atoi(p[11])
-				isEnterHide, _ := strconv.Atoi(p[21])
-				nobilityType, _ := strconv.Atoi(p[20])
 
-				var isRankHide int
-				if len(p) > 23 {
-					isRankHide, _ = strconv.Atoi(p[23])
-				}
-
-				return &UserInfo{
-					AppIDForCurrentUser: p[0],
-					AppIDForCurrentLive: p[1],
-					SessionID:           p[2],
-					IsReconnect:         p[3],
-					UserID:              p[4],
-					OpenID:              p[5],
-					Avatar:              p[6],
-					UserName:            p[7],
-					Sex:                 p[8],
-					Role:                p[9],
-					UserRole:            p[10],
-					ExpGrade:            expGrade,
-					GuardType:           p[12],
-					CarID:               p[13],
-					CarName:             p[14],
-					CarIcon:             p[15],
-					CarOnlineURL:        p[16],
-					CarResURL:           p[17],
-					IsPlayCarAnim:       p[18],
-					MarkUrlsJoinString:  p[19],
-					NobilityType:        nobilityType,
-					IsEnterHide:         isEnterHide,
-					TokenType:           p[22],
-					IsRankHide:          isRankHide,
-				}
-			}
-		}
-	}
-	return nil
-}
 
 type AuthenInfo struct {
 	TimeStamp       int64     // 时间戳
@@ -120,27 +51,7 @@ type AuthenInfo struct {
 	UsrInfo         *UserInfo // 用户信息
 }
 
-func newAuthenInfo(s string) *AuthenInfo {
-	if p := strings.Split(string(s), authenSeparator); len(p) > 3 {
-		// 连接签名验证
-		timestamp := p[0]
-		requestUniqueID := p[1]
-		usrInfoStr := p[2]
-		signature := p[3]
-		if helper.MD5(timestamp+"_"+requestUniqueID+"_"+usrInfoStr+salt) != signature {
-			Log.Error("连接签名验证失败")
-			return nil
-		}
 
-		return &AuthenInfo{
-			TimeStamp:       helper.Xor4Timestamp(timestamp),
-			RequestUniqueID: requestUniqueID,
-			Signature:       signature,
-			UsrInfo:         newUserInfo(usrInfoStr),
-		}
-	}
-	return nil
-}
 
 type WsConnectInfo struct {
 	Sid             *SessionsInfo
@@ -152,43 +63,7 @@ type WsConnectInfo struct {
 	SdkType         string // SDK类型 1看播端 2开播端
 }
 
-func NewWsConnectInfo(s string) *WsConnectInfo {
-	serverConfig := model.GetServerConfig()
 
-	if dst, err := helper.DecodeBase64(s); err == nil {
-		if dst, err = helper.Des3CBCDecrypt(dst, serverConfig.Des3Key4WsMsg); err == nil {
-			p := strings.Split(string(dst), wsConSeparator)
-			subAppId := ""
-			sdkVersion := ""
-			sdkType := ""
-
-			pLen := len(p)
-			if pLen < 3 {
-				return nil
-			}
-			if len(p) > 3 {
-				subAppId = p[3]
-			}
-			if len(p) > 4 {
-				sdkVersion = p[4]
-			}
-			if len(p) > 5 {
-				sdkType = p[5]
-			}
-
-			return &WsConnectInfo{
-				Sid:             newSessionInfo(p[0]),
-				SessionsInfoStr: p[0],
-				Token:           p[1],
-				Authen:          newAuthenInfo(p[2]),
-				SubAppId:        subAppId,
-				SdkVersion:      sdkVersion,
-				SdkType:         sdkType,
-			}
-		}
-	}
-	return nil
-}
 
 func (uwc *WsConnectInfo) IsRoomManager() bool {
 	return uwc.Authen.UsrInfo.Role == ROOM_MANAGER

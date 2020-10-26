@@ -56,8 +56,6 @@ func WebsocketHandler(c *gin.Context) {
 		return
 	}
 
-	// 更新用户在线信息
-	proto.UserOnlineInfoConnChan <- wsConnInfo
 
 	serverConfig := model.GetServerConfig()
 
@@ -83,36 +81,11 @@ func WebsocketHandler(c *gin.Context) {
 			return err
 		}
 
-		// ping 消息处理
-		if string(data) == proto.WEBSOCKET_PING {
-			// Log.Debugf("len = %v, read reqData = \n%v", len(data), string(data))
-
-			// 更新最后心跳时间
-			connection.WsConnectInfo.Authen.UsrInfo.LastPingTime = utils.GetTimeOfS()
-
-			// 更新用户在线信息
-			proto.UserOnlineInfoMsgChan <- wsConnInfo
-
-			return nil
-		}
 
 		reqData, err := helper.Des3CBCDecrypt4WebsocketMsg([]byte(serverConfig.Des3Key4WsMsg), data)
 		if err != nil {
 			Log.Warn(err)
 			return err
-		}
-
-		// 老版本 ping消息加密处理
-		if string(reqData) == proto.WEBSOCKET_PING {
-			// Log.Debugf("len = %v, read reqData = \n%v", len(data), string(data))
-
-			// 更新最后心跳时间
-			connection.WsConnectInfo.Authen.UsrInfo.LastPingTime = utils.GetTimeOfS()
-
-			// 更新用户在线信息
-			proto.UserOnlineInfoMsgChan <- wsConnInfo
-
-			return nil
 		}
 
 		Log.Infof("read reqData =%v, len = %v", string(reqData), len(reqData))

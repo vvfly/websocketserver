@@ -8,7 +8,7 @@ require (
 	github.com/forgoer/openssl v0.0.0-20200331032942-ad9f8d57d8b1
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
-	github.com/gomodule/redigo v1.8.2 // indirect
+	github.com/gomodule/redigo/redis v0.0.0-20200429221454-e14091dffc1b
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/consul/api v1.7.0
 	github.com/luckyweiwei/base v0.0.0-20201016064322-bb16dc4a77dd

@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin"/base/logger"
+	. "github.com/luckyweiwei/base/logger"
 )
 
 func HealthHandler(c *gin.Context) {

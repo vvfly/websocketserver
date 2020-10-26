@@ -41,10 +41,6 @@ func websocketServer() {
 	defer utils.CatchException()
 
 	router := createDefaultRouter()
-
-	// 设置路由处理函数
-	router.GET("/health", api.HealthHandler)
-
 	wsRouter := router.Group(WEBSOCKET_CONTEXT)
 	{
 		wsRouter.GET(WEBSOCKET_SESSION_NAME, middleware.WebsocketRequestResolver(), websocket.WebsocketHandler)

@@ -1,13 +1,5 @@
 package proto
 
-import "runtime"
-
-var (
-	UserOnlineInfoMsgChan  = make(chan *WsConnectInfo, 1024*64*runtime.NumCPU())
-	UserOnlineInfoConnChan = make(chan *WsConnectInfo, 1024*64*runtime.NumCPU())
-	// UserOnlineInfoDisConnChan = make(chan *WsConnectInfo, 1024*64*runtime.NumCPU())
-)
-
 type UserOnlineInfo struct {
 	SdkVersion         string `json:"sdkVersion"`
 	SdkType            string `json:"sdkType"`
