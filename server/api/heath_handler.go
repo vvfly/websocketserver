@@ -3,8 +3,8 @@ package api
 import (
 	"io"
 
-	. "git.nzajiw.com/base/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"/base/logger"
 )
 
 func HealthHandler(c *gin.Context) {
