@@ -44,8 +44,6 @@ func LoadConfig() *model.ServerConfig {
 
 func ServerInit() {
 	// server config init
-	// Log.Info("loading server config")
-	// serverConfig := LoadConfig()
 	serverConfig := model.GetServerConfig()
 
 	// init redis
