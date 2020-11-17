@@ -24,7 +24,7 @@
 *.xlsx
 
 # binary
-./bin/WebsocketServer
+bin/
 
 # vscode
 .vscode

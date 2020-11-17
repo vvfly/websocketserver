@@ -15,8 +15,8 @@ const (
 )
 
 type Connection struct {
-	// ReadPackNum   uint64
-	// WritePackNum  uint64
+	ReadPackNum   uint64
+	WritePackNum  uint64
 	Conn          *websocket.Conn
 	WsConnectInfo *proto.WsConnectInfo
 	DataCh        chan []byte

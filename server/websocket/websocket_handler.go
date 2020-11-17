@@ -56,7 +56,6 @@ func WebsocketHandler(c *gin.Context) {
 		return
 	}
 
-
 	serverConfig := model.GetServerConfig()
 
 	// 加入connection manager 管理
@@ -81,6 +80,7 @@ func WebsocketHandler(c *gin.Context) {
 			return err
 		}
 
+		connection.ReadPackNum++
 
 		reqData, err := helper.Des3CBCDecrypt4WebsocketMsg([]byte(serverConfig.Des3Key4WsMsg), data)
 		if err != nil {
@@ -88,7 +88,8 @@ func WebsocketHandler(c *gin.Context) {
 			return err
 		}
 
-		Log.Infof("read reqData =%v, len = %v", string(reqData), len(reqData))
+		Log.Infof("readPackNum = %v,len = %v,read reqData =%v",
+			connection.ReadPackNum, len(reqData), string(reqData))
 
 		grm.Go(sessionID+"-Msg", func() {
 			biz.BizHandler(sessionID, string(reqData))
@@ -104,6 +105,9 @@ func WebsocketHandler(c *gin.Context) {
 			Log.Warnf(emsg)
 			return errors.New(emsg)
 		}
+
+		connection.WritePackNum++
+		Log.Debugf("writePackNum = %v", connection.WritePackNum)
 
 		err := conn.WriteMessage(websocket.TextMessage, data)
 		if err != nil {

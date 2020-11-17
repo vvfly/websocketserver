@@ -1,5 +1,0 @@
-# log
-MaxSize = 200
-MaxBackups = 10
-MaxAge = 7
-Level = "DEBUG"
